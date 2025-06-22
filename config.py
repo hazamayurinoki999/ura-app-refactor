@@ -1,0 +1,4 @@
+# config.py
+APP_TITLE = "線分図生成アプリ"
+WINDOW_WIDTH = 1000
+WINDOW_HEIGHT = 700

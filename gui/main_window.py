@@ -35,6 +35,19 @@ class MainWindow(QWidget):
         self.generate_btn = QPushButton("線分図を生成")
         setting_layout.addWidget(self.generate_btn)
 
+        self.fit_btn = QPushButton("フィッティング")
+        setting_layout.addWidget(self.fit_btn)
+
+        # 合計モード切替ボタン（→ キャンセルボタンと交互表示）
+        sum_layout = QHBoxLayout()
+        self.sum_btn = QPushButton("合計")
+        self.cancel_sum_btn = QPushButton("×")
+        self.cancel_sum_btn.setFixedWidth(30)
+        self.cancel_sum_btn.hide()  # 初期は非表示
+        sum_layout.addWidget(self.sum_btn)
+        sum_layout.addWidget(self.cancel_sum_btn)
+        setting_layout.addLayout(sum_layout)
+
         setting_box.setLayout(setting_layout)
         main_layout.addWidget(setting_box)
 
@@ -65,6 +78,9 @@ class MainWindow(QWidget):
         # イベント接続
         self.count_spin.valueChanged.connect(self._rebuild_inputs)
         self.generate_btn.clicked.connect(self._handle_generate)
+        self.fit_btn.clicked.connect(self._handle_fit)
+        self.sum_btn.clicked.connect(self._handle_sum_mode_on)
+        self.cancel_sum_btn.clicked.connect(self._handle_sum_mode_off)
 
     def _rebuild_inputs(self):
         prev_segs = [sb.value() for sb in self.segment_boxes]
@@ -91,7 +107,6 @@ class MainWindow(QWidget):
         for i in range(row_count):
             outer_layout = QGridLayout()
 
-            # ラベル行
             left_label = QLineEdit()
             left_label.setPlaceholderText(f"ラベル{i+1}")
             left_label.setMaxLength(20)
@@ -163,3 +178,17 @@ class MainWindow(QWidget):
     def _handle_generate(self):
         data = self._gather_input_data()
         self.canvas.update_segments(data)
+
+    def _handle_fit(self):
+        data = self._gather_input_data()
+        self.canvas.update_segments_with_fit(data)
+
+    def _handle_sum_mode_on(self):
+        self.canvas.set_sum_mode(True)
+        self.sum_btn.hide()
+        self.cancel_sum_btn.show()
+
+    def _handle_sum_mode_off(self):
+        self.canvas.set_sum_mode(False)
+        self.cancel_sum_btn.hide()
+        self.sum_btn.show()
